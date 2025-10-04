@@ -76,3 +76,4 @@ DerivedDataCache/*
 # Temp Files
 Config/DefaultEditorPerProjectUserSettings.ini
 
+Content/Maps/AbandonedPowerPlant/Maps/PowerPlant_BuiltData.uasset
