@@ -3,6 +3,8 @@
 
 #include "LevelManager.h"
 #include "GameFramework/Actor.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
 
 
 ALevelManager::ALevelManager()
@@ -15,6 +17,13 @@ void ALevelManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
+	Coins.Empty();
+
+	for (TActorIterator<ACoin> It(GetWorld()); It; ++It)
+	{
+		Coins.Add(*It);
+	}
 }
 
 void ALevelManager::Tick(float DeltaTime)

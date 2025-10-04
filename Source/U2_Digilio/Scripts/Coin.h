@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Coin.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class U2_DIGILIO_API ACoin : public AActor
 {
 	GENERATED_BODY()

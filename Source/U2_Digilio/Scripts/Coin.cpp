@@ -35,13 +35,13 @@ void ACoin::BeginPlay()
 
 		if (DynMat)
 		{
-			DynMat->SetScalarParameterValue("GlowIntensity", 3.f);
+			DynMat->SetScalarParameterValue("GlowIntensity", 1.f);
 		}
 
 		AuraMaterial = AuraMesh->CreateAndSetMaterialInstanceDynamic(0);
 		if (AuraMaterial)
 		{
-			AuraMaterial->SetScalarParameterValue("GlowIntensity", 3.f);
+			AuraMaterial->SetScalarParameterValue("GlowIntensity", 1.f);
 		}
 	}
 }
@@ -53,6 +53,12 @@ void ACoin::Tick(float DeltaTime)
 	if (!WasCollected)
 	{
 		AddActorLocalRotation(FRotator(0.f, 0.f, RotationSpeed * DeltaTime));
+
+		if (AuraMaterial)
+		{
+			float Glow = 1.5f + 0.5f * FMath::Sin(GetWorld()->TimeSeconds * 5.f);
+			AuraMaterial->SetScalarParameterValue("GlowIntensity", Glow);
+		}
 	}
 }
 
