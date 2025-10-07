@@ -9,30 +9,12 @@ ACoin::ACoin()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Mesh principal
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
-	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	Mesh->SetGenerateOverlapEvents(true);
 
-	// Trigger box (solo para overlaps, sin bloqueo)
-	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	CollisionBox->SetupAttachment(RootComponent);
-	CollisionBox->SetBoxExtent(FVector(50.f));
-	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionBox->SetCollisionObjectType(ECC_WorldDynamic);
-	CollisionBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	CollisionBox->SetGenerateOverlapEvents(true);
-	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
-
-	// Aura
-	AuraMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AuraMesh"));
-	AuraMesh->SetupAttachment(RootComponent);
-	AuraMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetTriggerMesh();
+	SetBoxCollider();
+	SetAuraMesh();
 
 	WasCollected = false;
 }
@@ -58,30 +40,6 @@ void ACoin::BeginPlay()
 	}
 }
 
-void ACoin::SetOff()
-{
-	WasCollected = true;
-
-	AuraMesh->SetVisibility(false);
-	Mesh->SetVisibility(false);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	UE_LOG(LogTemp, Warning, TEXT("Moneda colectada!"));
-}
-
-void ACoin::SetTriggerCollider()
-{
-	/*Mesh->SetupAttachment(RootComponent);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
-	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	Mesh->SetGenerateOverlapEvents(true);*/
-	//Mesh->SetCollisionProfileName("Trigger");
-	//Mesh->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
-}
-
 void ACoin::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
@@ -92,7 +50,7 @@ void ACoin::Tick(float deltaTime)
 
 		if (AuraMaterial)
 		{
-			float Glow = 1.5f + 0.5f * FMath::Sin(GetWorld()->TimeSeconds * 5.f);
+			float Glow = 2.5f + 2.5f * FMath::Sin(GetWorld()->TimeSeconds * 5.f);
 			AuraMaterial->SetScalarParameterValue("GlowIntensity", Glow);
 		}
 	}
@@ -109,3 +67,46 @@ void ACoin::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 		SetOff();
 	}
 }
+
+void ACoin::SetOff()
+{
+	WasCollected = true;
+
+	AuraMesh->SetVisibility(false);
+	Mesh->SetVisibility(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UE_LOG(LogTemp, Warning, TEXT("Moneda colectada!"));
+}
+
+void ACoin::SetTriggerMesh()
+{
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Mesh->SetGenerateOverlapEvents(true);
+}
+
+void ACoin::SetBoxCollider()
+{
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+	CollisionBox->SetupAttachment(RootComponent);
+	CollisionBox->SetBoxExtent(FVector(50.f));
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionBox->SetCollisionObjectType(ECC_WorldDynamic);
+	CollisionBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionBox->SetGenerateOverlapEvents(true);
+	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
+}
+
+void ACoin::SetAuraMesh()
+{
+	AuraMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AuraMesh"));
+	AuraMesh->SetupAttachment(RootComponent);
+	AuraMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+

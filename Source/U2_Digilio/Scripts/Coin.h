@@ -47,5 +47,7 @@ protected:
 private:
 
 	void SetOff();
-	void SetTriggerCollider();
+	void SetTriggerMesh();
+	void SetBoxCollider();
+	void SetAuraMesh();
 };
