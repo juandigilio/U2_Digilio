@@ -11,44 +11,53 @@
 ALevelManager::ALevelManager()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	bAllCoinsCollected = false;
 }
 
 void ALevelManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetLightsOff();
+	SetLights();
 
-	/*coins.Empty();
-
-	for (TActorIterator<ACoin> It(GetWorld()); It; ++It)
+	for (ACoin* coin : coins)
 	{
-		coins.Add(*It);
-	}*/
+		if (coin)
+		{
+			totalCoins++;
+		}
+	}
 }
 
-void ALevelManager::SetLightsOff()
+void ALevelManager::SetLights()
 {
-	for (ADirectionalLight* light : directionalLights)
+	for (ADirectionalLight* light : statueLights)
 	{
 		light->GetLightComponent()->SetIntensity(0.0f);
 	}
+
+	mainLightIntensity = mainLight->GetLightComponent()->Intensity;
 }
 
 void ALevelManager::CheckCollectedCoins()
 {
 	if (!bAllCoinsCollected)
 	{
-		bAllCoinsCollected = true;
+		collectedCoins = 0;
 
 		for (ACoin* coin : coins)
 		{
-			if (coin && !coin->WasCollected)
+			if (coin && coin->WasCollected)
 			{
-				bAllCoinsCollected = false;
-				break;
+				collectedCoins++;
 			}
+		}
+
+		CheckLightIntensity();
+
+		if (collectedCoins >= totalCoins)
+		{
+			bAllCoinsCollected = true;
 		}
 	}
 }
@@ -84,12 +93,12 @@ void ALevelManager::SetLightsOn(float deltaTime)
 			LightComp->SetIntensity(NewIntensity);
 		};
 
-		for (ADirectionalLight* light : directionalLights)
+		for (ADirectionalLight* light : statueLights)
 		{
 			FadeLight(light);
 		}
 
-		if (directionalLights[0] && directionalLights[0]->GetLightComponent()->Intensity >= maxLightIntensity - 0.1f)
+		if (statueLights[0] && statueLights[0]->GetLightComponent()->Intensity >= maxLightIntensity - 0.1f)
 		{
 			bLightsFadingIn = false;
 
@@ -113,6 +122,11 @@ void ALevelManager::MoveDoor(float deltaTime)
 			//UE_LOG(LogTemp, Warning, TEXT("Puerta completamente abierta."));
 		}
 	}
+}
+
+void ALevelManager::CheckLightIntensity()
+{
+	mainLight->GetLightComponent()->SetIntensity((mainLightIntensity / 4) * (4 - collectedCoins));
 }
 
 void ALevelManager::Tick(float deltaTime)

@@ -29,7 +29,10 @@ public:
 	bool bAllCoinsCollected = false;
 
 	UPROPERTY(EditAnywhere, Category = "Lighting")
-	TArray<ADirectionalLight*> directionalLights;
+	ADirectionalLight* mainLight;
+
+	UPROPERTY(EditAnywhere, Category = "Lighting")
+	TArray<ADirectionalLight*> statueLights;
 
 	UPROPERTY(EditAnywhere, Category = "Lighting")
 	float lightFadeSpeed = 4.0f;
@@ -46,12 +49,16 @@ private:
 	bool bDoorMoved = false;
 	bool bIsDoorOpening = false;
 	bool bLightsFadingIn = false;
+	float mainLightIntensity;
+	int totalCoins;
+	int collectedCoins = 0;
 
-	void SetLightsOff();
+	void SetLights();
 	void CheckCollectedCoins();
 	void CheckDoorStatus(float deltaTime);
 	void SetLightsOn(float deltaTime);
 	void MoveDoor(float deltaTime);
+	void CheckLightIntensity();
 
 protected:
 	
