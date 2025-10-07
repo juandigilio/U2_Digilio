@@ -9,15 +9,27 @@ ACoin::ACoin()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Mesh principal
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Mesh->SetGenerateOverlapEvents(true);
 
+	// Trigger box (solo para overlaps, sin bloqueo)
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->SetupAttachment(RootComponent);
 	CollisionBox->SetBoxExtent(FVector(50.f));
-	CollisionBox->SetCollisionProfileName("Trigger");
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionBox->SetCollisionObjectType(ECC_WorldDynamic);
+	CollisionBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionBox->SetGenerateOverlapEvents(true);
 	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
 
+	// Aura
 	AuraMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AuraMesh"));
 	AuraMesh->SetupAttachment(RootComponent);
 	AuraMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -46,13 +58,37 @@ void ACoin::BeginPlay()
 	}
 }
 
-void ACoin::Tick(float DeltaTime)
+void ACoin::SetOff()
 {
-	Super::Tick(DeltaTime);
+	WasCollected = true;
+
+	AuraMesh->SetVisibility(false);
+	Mesh->SetVisibility(false);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UE_LOG(LogTemp, Warning, TEXT("Moneda colectada!"));
+}
+
+void ACoin::SetTriggerCollider()
+{
+	/*Mesh->SetupAttachment(RootComponent);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Mesh->SetGenerateOverlapEvents(true);*/
+	//Mesh->SetCollisionProfileName("Trigger");
+	//Mesh->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
+}
+
+void ACoin::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
 
 	if (!WasCollected)
 	{
-		AddActorLocalRotation(FRotator(0.f, 0.f, RotationSpeed * DeltaTime));
+		AddActorLocalRotation(FRotator(0.f, 0.f, RotationSpeed * deltaTime));
 
 		if (AuraMaterial)
 		{
@@ -70,13 +106,6 @@ void ACoin::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 
 	if (OtherActor && OtherActor != this && OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		WasCollected = true;
-
-		AuraMesh->SetVisibility(false);
-		Mesh->SetVisibility(false);
-		Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		CollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		UE_LOG(LogTemp, Warning, TEXT("Moneda colectada!"));
+		SetOff();
 	}
 }
