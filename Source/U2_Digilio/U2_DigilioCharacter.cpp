@@ -62,21 +62,21 @@ AU2_DigilioCharacter::AU2_DigilioCharacter()
 	Flashlight->SetVisibility(false);
 
 
-	if (GetMesh())
-	{
-		//FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
+	//if (GetMesh())
+	//{
+	//	//FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
 
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
-			FString::Printf(TEXT("Mesh encontrada")));*/
+	//	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
+	//		FString::Printf(TEXT("Mesh encontrada")));*/
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-			TEXT("GetMesh() la encontro"));
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-			TEXT("GetMesh() devolvió NULL"));
-	}
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+	//		TEXT("GetMesh() la encontro"));
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+	//		TEXT("GetMesh() devolvió NULL"));
+	//}
 
 	//if (GetMesh()->DoesSocketExist(TEXT("HandGrip_L")))
 	//{
