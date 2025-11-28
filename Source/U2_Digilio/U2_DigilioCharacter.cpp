@@ -10,13 +10,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Components/SpotLightComponent.h"
 #include "U2_Digilio.h"
 
 AU2_DigilioCharacter::AU2_DigilioCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -48,13 +49,53 @@ AU2_DigilioCharacter::AU2_DigilioCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+	//Flashlight->SetupAttachment(GetMesh(), TEXT("ring_metacarpal_lSocket"));
+	//Flashlight->SetRelativeLocation(FVector::ZeroVector);
+	Flashlight->SetupAttachment(GetMesh());
+	Flashlight->SetRelativeLocation(FVector(0.f, 0.f, 40.f)); // ajustar
+	Flashlight->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	//Flashlight->SetRelativeRotation(FRotator(90.f, 90.f, 90.f));
+	Flashlight->Intensity = 8000.f;
+	Flashlight->SetInnerConeAngle(2.f);
+	Flashlight->SetOuterConeAngle(20.f);
+	Flashlight->AttenuationRadius = 1500.f;
+	Flashlight->SetVisibility(false);
+
+
+	//if (GetMesh())
+	//{
+	//	/*FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
+
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
+	//		FString::Printf(TEXT("Mesh usado: %s"), *MeshName));*/
+	//}
+	//else
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+	//		TEXT("GetMesh() devolvió NULL"));
+	//}
+
+	//if (GetMesh()->DoesSocketExist(TEXT("ring_metacarpal_lSocket")))
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Socket encontrado: ChestFlashlightSocket"));
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Socket encontrado: ChestFlashlightSocket"));
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("NO se encontró el socket: ChestFlashlightSocket"));
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("NOOOOOOOOOOOOOOOOOOOOOOOOOO"));
+	//}
+
 }
 
 void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -65,6 +106,8 @@ void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AU2_DigilioCharacter::Look);
+
+		EnhancedInputComponent->BindAction(ToggleFlashlightAction, ETriggerEvent::Started, this, &AU2_DigilioCharacter::ToggleFlashlight);
 	}
 	else
 	{
@@ -88,6 +131,16 @@ void AU2_DigilioCharacter::Look(const FInputActionValue& Value)
 
 	// route the input
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
+}
+
+void AU2_DigilioCharacter::ToggleFlashlight(const FInputActionValue& Value)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle Flashlight action triggered"));
+
+	if (!Flashlight) return;
+
+	bool bIsOn = Flashlight->IsVisible();
+	Flashlight->SetVisibility(!bIsOn);
 }
 
 void AU2_DigilioCharacter::DoMove(float Right, float Forward)

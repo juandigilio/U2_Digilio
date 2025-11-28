@@ -18,7 +18,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  A simple player-controllable third person character
  *  Implements a controllable orbiting camera
  */
-UCLASS(abstract)
+UCLASS(Blueprintable)
 class AU2_DigilioCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -49,6 +49,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* ToggleFlashlightAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	class USpotLightComponent* Flashlight;
+
 public:
 
 	/** Constructor */
@@ -66,6 +72,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void ToggleFlashlight(const FInputActionValue& Value);
 
 public:
 
