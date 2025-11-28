@@ -56,6 +56,7 @@ protected:
 	class USpotLightComponent* Flashlight;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaTime) override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

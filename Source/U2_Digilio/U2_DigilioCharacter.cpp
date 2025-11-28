@@ -16,6 +16,8 @@
 
 AU2_DigilioCharacter::AU2_DigilioCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -81,6 +83,13 @@ void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	{
 		UE_LOG(LogU2_Digilio, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void AU2_DigilioCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CheckEnemyIllumination();
 }
 
 void AU2_DigilioCharacter::Move(const FInputActionValue& Value)
