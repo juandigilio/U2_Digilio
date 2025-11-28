@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/SpotLightComponent.h"
+#include "Enemy.h"
 #include "U2_Digilio.h"
 
 AU2_DigilioCharacter::AU2_DigilioCharacter()
@@ -60,51 +61,18 @@ AU2_DigilioCharacter::AU2_DigilioCharacter()
 	Flashlight->SetOuterConeAngle(28.f);
 	Flashlight->AttenuationRadius = 630.f;
 	Flashlight->SetVisibility(false);
-
-
-	//if (GetMesh())
-	//{
-	//	//FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
-
-	//	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
-	//		FString::Printf(TEXT("Mesh encontrada")));*/
-
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-	//		TEXT("GetMesh() la encontro"));
-	//}
-	//else
-	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-	//		TEXT("GetMesh() devolvió NULL"));
-	//}
-
-	//if (GetMesh()->DoesSocketExist(TEXT("HandGrip_L")))
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Socket encontrado: HandGrip_L"));
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Socket encontrado: HandGrip_L"));
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("NO se encontró el socket: HandGrip_L"));
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("NOOOOOOOOOOOOOOOOOOOOOOOOOO"));
-	//}
-
 }
 
 void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AU2_DigilioCharacter::Move);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AU2_DigilioCharacter::Look);
 
-		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AU2_DigilioCharacter::Look);
 
 		EnhancedInputComponent->BindAction(ToggleFlashlightAction, ETriggerEvent::Started, this, &AU2_DigilioCharacter::ToggleFlashlight);
@@ -117,26 +85,20 @@ void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void AU2_DigilioCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	// route the input
 	DoMove(MovementVector.X, MovementVector.Y);
 }
 
 void AU2_DigilioCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	// route the input
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
 }
 
 void AU2_DigilioCharacter::ToggleFlashlight(const FInputActionValue& Value)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Toggle Flashlight action triggered"));
-
 	if (!Flashlight) return;
 
 	bool bIsOn = Flashlight->IsVisible();
@@ -147,17 +109,13 @@ void AU2_DigilioCharacter::DoMove(float Right, float Forward)
 {
 	if (GetController() != nullptr)
 	{
-		// find out which way is forward
 		const FRotator Rotation = GetController()->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement 
 		AddMovementInput(ForwardDirection, Forward);
 		AddMovementInput(RightDirection, Right);
 	}
@@ -167,7 +125,6 @@ void AU2_DigilioCharacter::DoLook(float Yaw, float Pitch)
 {
 	if (GetController() != nullptr)
 	{
-		// add yaw and pitch input to controller
 		AddControllerYawInput(Yaw);
 		AddControllerPitchInput(Pitch);
 	}
@@ -175,12 +132,30 @@ void AU2_DigilioCharacter::DoLook(float Yaw, float Pitch)
 
 void AU2_DigilioCharacter::DoJumpStart()
 {
-	// signal the character to jump
 	Jump();
 }
 
 void AU2_DigilioCharacter::DoJumpEnd()
 {
-	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AU2_DigilioCharacter::CheckEnemyIllumination()
+{
+	if (Flashlight && Flashlight->IsVisible()) 
+	{ 
+		FVector Start = Flashlight->GetComponentLocation(); 
+		FVector End = Start + Flashlight->GetForwardVector() * 1500.f; 
+		FHitResult Hit; 
+		FCollisionQueryParams Params; 
+		Params.AddIgnoredActor(this); 
+		
+		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params)) 
+		{ 
+			if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor())) 
+			{ 
+				enemy->SetIlluminated(true); 
+			} 
+		} 
+	}
 }
