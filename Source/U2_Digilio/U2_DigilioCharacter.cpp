@@ -52,40 +52,40 @@ AU2_DigilioCharacter::AU2_DigilioCharacter()
 
 
 	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
-	//Flashlight->SetupAttachment(GetMesh(), TEXT("ring_metacarpal_lSocket"));
-	//Flashlight->SetRelativeLocation(FVector::ZeroVector);
 	Flashlight->SetupAttachment(GetMesh());
 	Flashlight->SetRelativeLocation(FVector(0.f, 0.f, 40.f)); // ajustar
-	Flashlight->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-	//Flashlight->SetRelativeRotation(FRotator(90.f, 90.f, 90.f));
-	Flashlight->Intensity = 8000.f;
-	Flashlight->SetInnerConeAngle(2.f);
-	Flashlight->SetOuterConeAngle(20.f);
-	Flashlight->AttenuationRadius = 1500.f;
+	Flashlight->SetRelativeRotation(FRotator(0.f, 0.f, 90.f));
+	Flashlight->Intensity = 100000.f;
+	Flashlight->SetInnerConeAngle(15.f);
+	Flashlight->SetOuterConeAngle(28.f);
+	Flashlight->AttenuationRadius = 630.f;
 	Flashlight->SetVisibility(false);
 
 
-	//if (GetMesh())
-	//{
-	//	/*FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
+	if (GetMesh())
+	{
+		//FString MeshName = GetMesh()->GetSkeletalMeshAsset()->GetName();
 
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
-	//		FString::Printf(TEXT("Mesh usado: %s"), *MeshName));*/
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan,
+			FString::Printf(TEXT("Mesh encontrada")));*/
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+			TEXT("GetMesh() la encontro"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+			TEXT("GetMesh() devolvió NULL"));
+	}
+
+	//if (GetMesh()->DoesSocketExist(TEXT("HandGrip_L")))
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Socket encontrado: HandGrip_L"));
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Socket encontrado: HandGrip_L"));
 	//}
 	//else
 	//{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-	//		TEXT("GetMesh() devolvió NULL"));
-	//}
-
-	//if (GetMesh()->DoesSocketExist(TEXT("ring_metacarpal_lSocket")))
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Socket encontrado: ChestFlashlightSocket"));
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Socket encontrado: ChestFlashlightSocket"));
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("NO se encontró el socket: ChestFlashlightSocket"));
+	//	UE_LOG(LogTemp, Error, TEXT("NO se encontró el socket: HandGrip_L"));
 	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("NOOOOOOOOOOOOOOOOOOOOOOOOOO"));
 	//}
 
