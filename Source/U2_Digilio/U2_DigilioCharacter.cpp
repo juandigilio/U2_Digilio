@@ -13,6 +13,7 @@
 #include "Components/SpotLightComponent.h"
 #include "Enemy.h"
 #include "U2_Digilio.h"
+#include "Kismet/GameplayStatics.h"
 
 AU2_DigilioCharacter::AU2_DigilioCharacter()
 {
@@ -63,6 +64,8 @@ AU2_DigilioCharacter::AU2_DigilioCharacter()
 	Flashlight->SetOuterConeAngle(28.f);
 	Flashlight->AttenuationRadius = 630.f;
 	Flashlight->SetVisibility(false);
+
+	RaycastDistance = 3000.f;
 }
 
 void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -90,6 +93,13 @@ void AU2_DigilioCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CheckEnemyIllumination();
+}
+
+void AU2_DigilioCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	FindAllEnemies();
 }
 
 void AU2_DigilioCharacter::Move(const FInputActionValue& Value)
@@ -151,20 +161,56 @@ void AU2_DigilioCharacter::DoJumpEnd()
 
 void AU2_DigilioCharacter::CheckEnemyIllumination()
 {
+	for (AEnemy* Enemy : EnemiesInLevel)
+	{
+		if (Enemy)
+			Enemy->SetIlluminated(false);
+	}
+	
 	if (Flashlight && Flashlight->IsVisible()) 
 	{ 
 		FVector Start = Flashlight->GetComponentLocation(); 
-		FVector End = Start + Flashlight->GetForwardVector() * 1500.f; 
+		FVector End = Start + Flashlight->GetForwardVector() * RaycastDistance; 
 		FHitResult Hit; 
 		FCollisionQueryParams Params; 
 		Params.AddIgnoredActor(this); 
 		
 		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params)) 
 		{ 
-			if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor())) 
-			{ 
-				enemy->SetIlluminated(true); 
-			} 
-		} 
+			//if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor())) 
+			//{ 
+			//	enemy->SetIlluminated(true); 
+			//}
+			if (AActor* HitActor = Hit.GetActor())
+			{
+				FString Msg = FString::Printf(TEXT("Raycast hit: %s"), *HitActor->GetName());
+				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, Msg);
+			}
+
+			if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor()))
+			{
+				enemy->SetIlluminated(true);
+			}
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, TEXT("Raycast hit: NOTHING"));
+		}
 	}
+}
+
+void AU2_DigilioCharacter::FindAllEnemies()
+{
+	TArray<AActor*> Found;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), Found);
+
+	for (AActor* A : Found)
+	{
+		if (AEnemy* Enemy = Cast<AEnemy>(A))
+		{
+			EnemiesInLevel.Add(Enemy);
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Cargados %d enemigos."), EnemiesInLevel.Num());
 }
