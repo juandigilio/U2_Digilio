@@ -1,4 +1,6 @@
 #include "Scripts/U2_PlayerState.h"
+#include "EngineUtils.h"
+#include "Coin.h"
 
 AU2_PlayerState::AU2_PlayerState()
 {
@@ -7,6 +9,21 @@ AU2_PlayerState::AU2_PlayerState()
 
 	FlashlightEnergy = MaxFlashlightEnergy;
 }
+
+void AU2_PlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	for (TActorIterator<ACoin> It(GetWorld()); It; ++It)
+	{
+		ACoin* Coin = *It;
+		if (Coin)
+		{
+			Coin->OnCoinCollected.AddDynamic(this, &AU2_PlayerState::OnCoinCollected);
+		}
+	}
+}
+
 
 void AU2_PlayerState::AddCoin()
 {
@@ -43,4 +60,11 @@ bool AU2_PlayerState::HasEnergy() const
 float AU2_PlayerState::GetEnergyPercent() const
 {
 	return FlashlightEnergy / MaxFlashlightEnergy;
+}
+
+void AU2_PlayerState::OnCoinCollected()
+{
+	AddCoin();
+
+	UE_LOG(LogTemp, Warning, TEXT("PlayerState: Coin collected! Total: %d"), CollectedCoins);
 }

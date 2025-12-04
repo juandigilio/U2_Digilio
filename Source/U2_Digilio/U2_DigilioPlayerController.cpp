@@ -1,4 +1,3 @@
-/*
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 
@@ -13,43 +12,35 @@
 void AU2_DigilioPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// only spawn touch controls on local player controllers
+	
 	if (SVirtualJoystick::ShouldDisplayTouchInterface() && IsLocalPlayerController())
 	{
-		// spawn the mobile controls widget
 		MobileControlsWidget = CreateWidget<UUserWidget>(this, MobileControlsWidgetClass);
 
 		if (MobileControlsWidget)
 		{
-			// add the controls to the player screen
 			MobileControlsWidget->AddToPlayerScreen(0);
 
 		} else {
 
 			UE_LOG(LogU2_Digilio, Error, TEXT("Could not spawn mobile controls widget."));
-
 		}
-
 	}
 }
 
 void AU2_DigilioPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
-	// only add IMCs for local player controllers
+	
 	if (IsLocalPlayerController())
 	{
-		// Add Input Mapping Contexts
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
 			for (UInputMappingContext* CurrentContext : DefaultMappingContexts)
 			{
 				Subsystem->AddMappingContext(CurrentContext, 0);
 			}
-
-			// only add these IMCs if we're not using mobile touch input
+			
 			if (!SVirtualJoystick::ShouldDisplayTouchInterface())
 			{
 				for (UInputMappingContext* CurrentContext : MobileExcludedMappingContexts)
@@ -60,4 +51,3 @@ void AU2_DigilioPlayerController::SetupInputComponent()
 		}
 	}
 }
-*/

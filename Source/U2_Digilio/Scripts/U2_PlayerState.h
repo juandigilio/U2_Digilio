@@ -34,7 +34,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Stats")
 	void AddCoin();
-
+	
 	UFUNCTION(BlueprintCallable, Category="Stats")
 	void ApplyDamage(float Amount);
 
@@ -49,4 +49,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Flashlight")
 	float GetEnergyPercent() const;
+
+	UFUNCTION()
+	void OnCoinCollected();
+
+protected:
+	
+	virtual void BeginPlay() override;
 };

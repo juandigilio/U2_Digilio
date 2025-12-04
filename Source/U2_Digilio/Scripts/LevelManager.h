@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DirectionalLight.h"
 #include "Coin.h"
+#include "U2_PlayerState.h"
 #include "LevelManager.generated.h"
 
 UCLASS()
@@ -44,6 +45,10 @@ public:
 	virtual void Tick(float deltaTime) override;
 
 private:
+
+	UPROPERTY()
+	AU2_PlayerState* CachedPlayerState;
+	
 	FVector doorStartLocation;
 	FVector doorTargetLocation;
 	bool bDoorMoved = false;
@@ -54,11 +59,11 @@ private:
 	int collectedCoins = 0;
 
 	void SetLights();
-	void CheckCollectedCoins();
 	void CheckDoorStatus(float deltaTime);
 	void SetLightsOn(float deltaTime);
 	void MoveDoor(float deltaTime);
-	void CheckLightIntensity();
+	UFUNCTION()
+	void OnCoinCollectedHandler();
 
 protected:
 	

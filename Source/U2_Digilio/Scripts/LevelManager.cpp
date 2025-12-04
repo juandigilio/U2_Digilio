@@ -20,11 +20,14 @@ void ALevelManager::BeginPlay()
 
 	SetLights();
 
+	CachedPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<AU2_PlayerState>();
+
 	for (ACoin* coin : coins)
 	{
 		if (coin)
 		{
 			totalCoins++;
+			coin->OnCoinCollected.AddDynamic(this, &ALevelManager::OnCoinCollectedHandler);
 		}
 	}
 }
@@ -37,29 +40,6 @@ void ALevelManager::SetLights()
 	}
 
 	mainLightIntensity = mainLight->GetLightComponent()->Intensity;
-}
-
-void ALevelManager::CheckCollectedCoins()
-{
-	if (!bAllCoinsCollected)
-	{
-		collectedCoins = 0;
-
-		for (ACoin* coin : coins)
-		{
-			if (coin && coin->WasCollected)
-			{
-				collectedCoins++;
-			}
-		}
-
-		CheckLightIntensity();
-
-		if (collectedCoins >= totalCoins)
-		{
-			bAllCoinsCollected = true;
-		}
-	}
 }
 
 void ALevelManager::CheckDoorStatus(float deltaTime)
@@ -121,16 +101,21 @@ void ALevelManager::MoveDoor(float deltaTime)
 	}
 }
 
-void ALevelManager::CheckLightIntensity()
+void ALevelManager::OnCoinCollectedHandler()
 {
-	mainLight->GetLightComponent()->SetIntensity((mainLightIntensity / 4) * (4 - collectedCoins));
+	collectedCoins++;
+	UE_LOG(LogTemp, Warning, TEXT("Coin recogida! Total: %d"), collectedCoins);
+
+	if (collectedCoins >= totalCoins)
+	{
+		bAllCoinsCollected = true;
+	}
 }
 
 void ALevelManager::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
-
-	CheckCollectedCoins();
+	
 	CheckDoorStatus(deltaTime);
 	SetLightsOn(deltaTime);
 }

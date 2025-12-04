@@ -64,7 +64,7 @@ void ACoin::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 
 	if (OtherActor && OtherActor != this && OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		SetOff();
+		Collect();
 	}
 }
 
@@ -107,6 +107,16 @@ void ACoin::SetAuraMesh()
 	AuraMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AuraMesh"));
 	AuraMesh->SetupAttachment(RootComponent);
 	AuraMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACoin::Collect()
+{
+	if (WasCollected) return;
+	WasCollected = true;
+
+	SetOff();
+
+	OnCoinCollected.Broadcast(); 
 }
 
 

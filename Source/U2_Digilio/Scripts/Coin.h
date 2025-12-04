@@ -6,12 +6,17 @@
 #include "GameFramework/Actor.h"
 #include "Coin.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCoinCollected);
+
 UCLASS(Blueprintable)
 class U2_DIGILIO_API ACoin : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+
+	UPROPERTY(BlueprintAssignable, Category="Coin")
+	FOnCoinCollected OnCoinCollected;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Coin")
 	UStaticMeshComponent* Mesh;
@@ -50,4 +55,5 @@ private:
 	void SetTriggerMesh();
 	void SetBoxCollider();
 	void SetAuraMesh();
+	void Collect();
 };
