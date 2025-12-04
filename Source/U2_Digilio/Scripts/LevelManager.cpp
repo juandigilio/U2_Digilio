@@ -73,7 +73,7 @@ void ALevelManager::CheckDoorStatus(float deltaTime)
 			bIsDoorOpening = true;
 			bDoorMoved = true;
 
-			UE_LOG(LogTemp, Warning, TEXT("Todas las monedas fueron colectadas. ¡Abriendo puerta!"));
+			UE_LOG(LogTemp, Warning, TEXT("Todas las monedas fueron colectadas. ï¿½Abriendo puerta!"));
 		}
 
 		MoveDoor(deltaTime);
@@ -101,8 +101,6 @@ void ALevelManager::SetLightsOn(float deltaTime)
 		if (statueLights[0] && statueLights[0]->GetLightComponent()->Intensity >= maxLightIntensity - 0.1f)
 		{
 			bLightsFadingIn = false;
-
-			//UE_LOG(LogTemp, Warning, TEXT("Luces encendidas al máximo."));
 		}
 	}
 }
@@ -119,7 +117,6 @@ void ALevelManager::MoveDoor(float deltaTime)
 		{
 			bIsDoorOpening = false;
 			bLightsFadingIn = true;
-			//UE_LOG(LogTemp, Warning, TEXT("Puerta completamente abierta."));
 		}
 	}
 }
