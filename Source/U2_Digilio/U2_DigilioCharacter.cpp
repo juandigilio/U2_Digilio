@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/SpotLightComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "U2_Digilio.h"
 #include "Kismet/GameplayStatics.h"
@@ -167,36 +168,70 @@ void AU2_DigilioCharacter::CheckEnemyIllumination()
 			Enemy->SetIlluminated(false);
 	}
 	
-	if (Flashlight && Flashlight->IsVisible()) 
-	{ 
-		FVector Start = Flashlight->GetComponentLocation(); 
-		FVector End = Start + Flashlight->GetForwardVector() * RaycastDistance; 
-		FHitResult Hit; 
-		FCollisionQueryParams Params; 
-		Params.AddIgnoredActor(this); 
-		
-		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params)) 
-		{ 
-			//if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor())) 
-			//{ 
-			//	enemy->SetIlluminated(true); 
-			//}
-			if (AActor* HitActor = Hit.GetActor())
+	if (Flashlight && Flashlight->IsVisible())
+	{
+		FVector Start   = Flashlight->GetComponentLocation();
+		FVector Forward = Flashlight->GetForwardVector();
+		FVector Right   = GetActorRightVector();
+		FVector Up      = GetActorUpVector();
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		auto DoSphereCast = [&](const FVector& End, float Radius)
+		{
+			FHitResult Hit;
+			bool bHit = GetWorld()->SweepSingleByChannel(
+				Hit,
+				Start,
+				End,
+				FQuat::Identity,
+				ECC_Visibility,
+				FCollisionShape::MakeSphere(Radius),
+				Params
+			);
+			
+			//DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, false, 0.05f, 0, 1.f);
+			//DrawDebugSphere(GetWorld(), End, Radius, 12, FColor::Blue, false, 0.05f);
+
+			if (bHit)
 			{
-				FString Msg = FString::Printf(TEXT("Raycast hit: %s"), *HitActor->GetName());
-				GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, Msg);
+				//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 12.f, 12, FColor::Red, false, 0.2f);
+
+				if (AEnemy* Enemy = Cast<AEnemy>(Hit.GetActor()))
+				{
+					Enemy->SetIlluminated(true);
+				}
 			}
 
-			if (AEnemy* enemy = Cast<AEnemy>(Hit.GetActor()))
+			return bHit;
+		};
+		
+		FVector EndCenter = Start + Forward * RaycastDistance;
+		DoSphereCast(EndCenter, SphereRadius);
+
+		for (int x = -RaysX; x <= RaysX; x++)
+		{
+			for (int y = -RaysY; y <= RaysY; y++)
 			{
-				enemy->SetIlluminated(true);
+				if (x == 0 && y == 0) continue;
+
+				float AngleX = (x / (float)RaysX) * ConoAngulo;
+				float AngleY = (y / (float)RaysY) * ConoAngulo;
+				
+				FVector Dir = Forward
+					+ Right * FMath::Tan(FMath::DegreesToRadians(AngleX))
+					+ Up    * FMath::Tan(FMath::DegreesToRadians(AngleY));
+			
+				Dir = Dir.GetSafeNormal();
+
+				FVector End = Start + Dir * RaycastDistance;
+
+				DoSphereCast(End, SphereRadius * 0.8f);
 			}
 		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, TEXT("Raycast hit: NOTHING"));
-		}
 	}
+
 }
 
 void AU2_DigilioCharacter::FindAllEnemies()

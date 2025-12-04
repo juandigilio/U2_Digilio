@@ -48,6 +48,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flashlight")
 	float RaycastDistance;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	float SphereRadius = 50.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	float ConoAngulo   = 15.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	int   RaysX = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flashlight")
+	int   RaysY = 3;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
