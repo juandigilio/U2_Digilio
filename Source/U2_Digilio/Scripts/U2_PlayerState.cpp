@@ -28,12 +28,14 @@ void AU2_PlayerState::BeginPlay()
 void AU2_PlayerState::AddCoin()
 {
 	CollectedCoins++;
+	OnStatsChanged.Broadcast();
 }
 
 void AU2_PlayerState::ApplyDamage(float Amount)
 {
 	Health -= Amount;
 	if (Health < 0) Health = 0;
+	OnStatsChanged.Broadcast();
 }
 
 void AU2_PlayerState::DrainEnergy(float DeltaTime)
@@ -42,6 +44,8 @@ void AU2_PlayerState::DrainEnergy(float DeltaTime)
 
 	if (FlashlightEnergy < 5000)
 		FlashlightEnergy = 5000;
+	
+	OnStatsChanged.Broadcast();
 }
 
 void AU2_PlayerState::RechargeEnergy(float DeltaTime)
@@ -50,6 +54,8 @@ void AU2_PlayerState::RechargeEnergy(float DeltaTime)
 
 	if (FlashlightEnergy > MaxFlashlightEnergy)
 		FlashlightEnergy = MaxFlashlightEnergy;
+
+	OnStatsChanged.Broadcast();
 }
 
 bool AU2_PlayerState::HasEnergy() const

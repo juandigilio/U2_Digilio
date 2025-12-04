@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "U2_DigilioHUD.generated.h"
 
+class UU2_HUDWidget;
+
 /**
  * 
  */
@@ -14,6 +16,13 @@ class U2_DIGILIO_API AU2_DigilioHUD : public AHUD
 {
 	GENERATED_BODY()
 	
-public:
-	AU2_DigilioHUD();
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category="HUD")
+	TSubclassOf<UU2_HUDWidget> HUDWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* HUDWidget;
+
+	virtual void BeginPlay() override;
 };

@@ -4,6 +4,9 @@
 #include "GameFramework/PlayerState.h"
 #include "U2_PlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatsChanged);
+
+
 UCLASS()
 class U2_DIGILIO_API AU2_PlayerState : public APlayerState
 {
@@ -12,6 +15,11 @@ class U2_DIGILIO_API AU2_PlayerState : public APlayerState
 public:
 
 	AU2_PlayerState();
+	
+
+	UPROPERTY(BlueprintAssignable, Category="Stats")
+	FOnStatsChanged OnStatsChanged;
+	
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Stats")
 	int32 CollectedCoins = 0;
@@ -52,6 +60,8 @@ public:
 
 	UFUNCTION()
 	void OnCoinCollected();
+
+	
 
 protected:
 	

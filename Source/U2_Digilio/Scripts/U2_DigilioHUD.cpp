@@ -2,7 +2,21 @@
 
 
 #include "Scripts/U2_DigilioHUD.h"
+#include "Blueprint/UserWidget.h"
+#include "Scripts/U2_HUDWidget.h"
 
-AU2_DigilioHUD::AU2_DigilioHUD()
+
+void AU2_DigilioHUD::BeginPlay()
 {
+	Super::BeginPlay();
+
+	if (HUDWidgetClass)
+	{
+		HUDWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+		if (HUDWidget)
+		{
+			HUDWidget->AddToViewport();
+		}
+	}
 }
