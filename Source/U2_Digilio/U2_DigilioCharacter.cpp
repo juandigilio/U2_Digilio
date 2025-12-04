@@ -93,12 +93,23 @@ void AU2_DigilioCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	CheckEnemyIllumination();
+	HandleFlashlight(DeltaTime);
 }
 
 void AU2_DigilioCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetPlayerState();
+
+	if (Flashlight)
+	{
+		InitialFlashlightIntensity = Flashlight->Intensity; // lee el valor que definiste en inspector (ej. 100000)
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Flashlight no encontrada en BeginPlay"));
+	}
 	
 	FindAllEnemies();
 }
@@ -123,6 +134,16 @@ void AU2_DigilioCharacter::ToggleFlashlight(const FInputActionValue& Value)
 
 	bool bIsOn = Flashlight->IsVisible();
 	Flashlight->SetVisibility(!bIsOn);
+}
+
+void AU2_DigilioCharacter::SetPlayerState()
+{
+	CachedPlayerState = GetPlayerState<AU2_PlayerState>();
+    
+	if (!CachedPlayerState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerState NO ENCONTRADO EN BeginPlay"));
+	}
 }
 
 void AU2_DigilioCharacter::DoMove(float Right, float Forward)
@@ -160,8 +181,10 @@ void AU2_DigilioCharacter::DoJumpEnd()
 	StopJumping();
 }
 
-void AU2_DigilioCharacter::CheckEnemyIllumination()
+bool AU2_DigilioCharacter::CheckEnemyIllumination()
 {
+	bool bIlluminating = false;
+	
 	for (AEnemy* Enemy : EnemiesInLevel)
 	{
 		if (Enemy)
@@ -201,6 +224,7 @@ void AU2_DigilioCharacter::CheckEnemyIllumination()
 				if (AEnemy* Enemy = Cast<AEnemy>(Hit.GetActor()))
 				{
 					Enemy->SetIlluminated(true);
+					bIlluminating = true;
 				}
 			}
 
@@ -232,6 +256,38 @@ void AU2_DigilioCharacter::CheckEnemyIllumination()
 		}
 	}
 
+	return bIlluminating;
+}
+
+void AU2_DigilioCharacter::HandleFlashlight(float DeltaTime)
+{
+	if (Flashlight->IsVisible())
+	{
+		bIlluminatingEnemy = CheckEnemyIllumination();
+
+		if (bIlluminatingEnemy)
+		{
+			CachedPlayerState->RechargeEnergy(DeltaTime);
+		}
+		else
+		{
+			CachedPlayerState->DrainEnergy(DeltaTime);
+		}
+
+		if (!CachedPlayerState->HasEnergy())
+		{
+			Flashlight->SetVisibility(false);
+			Flashlight->SetIntensity(0.f);
+			return;
+		}
+
+		const float EnergyPercent = CachedPlayerState->GetEnergyPercent();
+		const float TargetIntensity = FMath::Lerp(MinFlashlightIntensity, InitialFlashlightIntensity, EnergyPercent);
+		
+		float Current = Flashlight->Intensity;
+		float Smoothed = FMath::FInterpTo(Current, TargetIntensity, DeltaTime, 8.f);
+		Flashlight->SetIntensity(Smoothed);
+	}
 }
 
 void AU2_DigilioCharacter::FindAllEnemies()

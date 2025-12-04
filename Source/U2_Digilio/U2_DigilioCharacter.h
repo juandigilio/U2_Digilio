@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Scripts/U2_PlayerState.h"
 #include "U2_DigilioCharacter.generated.h"
 
 class USpringArmComponent;
@@ -65,6 +66,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void ToggleFlashlight(const FInputActionValue& Value);
+	void SetPlayerState();
 
 public:
 
@@ -86,8 +88,18 @@ private:
 
 	UPROPERTY()
 	TArray<AEnemy*> EnemiesInLevel;
+
+	UPROPERTY()
+	AU2_PlayerState* CachedPlayerState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(AllowPrivateAccess="true"))
+	float MinFlashlightIntensity = 5000.f;
 	
-	void CheckEnemyIllumination();
+	float InitialFlashlightIntensity = 100000.f;
+	bool bIlluminatingEnemy;
+	
+	bool CheckEnemyIllumination();
+	void HandleFlashlight(float DeltaTime);
 	void FindAllEnemies();
 };
 
