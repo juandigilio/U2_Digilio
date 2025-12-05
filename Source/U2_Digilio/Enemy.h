@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Enemy.h
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "U2_DigilioCharacter.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -22,26 +23,30 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "AI|Movement")
 	float RotationSpeed = 5.f;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "AI|Movement")
 	float MoveSpeed = 300.f;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float Damage = 0.1f;
+	UPROPERTY(EditAnywhere, Category = "AI|Combat")
+	float DamagePerHit = 10.f;
 
-	UFUNCTION()
-	void OnEnemyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPROPERTY(EditAnywhere, Category = "AI|Combat")
+	float DamageRadius = 120.f;
 
+	UPROPERTY(EditAnywhere, Category = "Animations")
+	UAnimMontage* AttackMontage;
 
 	virtual void BeginPlay() override;
 
 private:
 
-	APawn* Player = nullptr;
 	bool bIsIlluminated = false;
 
-	void LookAtPlayer(float DeltaTime); 
+	UPROPERTY()
+	AU2_DigilioCharacter* Player = nullptr;
+
+	void LookAtPlayer(float DeltaTime);
 	void FollowPlayer(float DeltaTime, FVector ToPlayer);
 };

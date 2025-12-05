@@ -1,43 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Enemy.cpp
 
 #include "Enemy.h"
-
-#include "U2_DigilioCharacter.h"
-#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnEnemyOverlap);
-}
-
-void AEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (!Player) return; 
-	
-	LookAtPlayer(DeltaTime);
-}
-
-void AEnemy::OnEnemyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (AU2_DigilioCharacter* PlayerTemp = Cast<AU2_DigilioCharacter>(OtherActor))
-	{
-		PlayerTemp->TakeDamage(Damage);
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Player DAMAGED!"));
-	}
 }
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	Player = Cast<AU2_DigilioCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (Player)
 	{
@@ -51,9 +27,53 @@ void AEnemy::BeginPlay()
 	}
 }
 
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AEnemy::Tick(float DeltaTime)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::Tick(DeltaTime);
+
+	if (!Player) return;
+	
+	LookAtPlayer(DeltaTime);
+
+	FVector ToPlayer = Player->GetActorLocation() - GetActorLocation();
+	FollowPlayer(DeltaTime, ToPlayer);
+	
+	float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
+
+	if (Distance <= DamageRadius)
+	{
+		if (AttackMontage && !IsPlayingRootMotion())
+		{
+			Player->TakeDamage(DamagePerHit);
+			PlayAnimMontage(AttackMontage);
+		}
+	}
+}
+
+void AEnemy::LookAtPlayer(float DeltaTime)
+{
+	if (!Player) return;
+
+	FVector ToPlayer = Player->GetActorLocation() - GetActorLocation();
+	FRotator LookAtRotation = ToPlayer.Rotation();
+
+	FRotator SmoothRotation = FMath::RInterpTo(
+		GetActorRotation(),
+		LookAtRotation,
+		DeltaTime,
+		RotationSpeed
+	);
+
+	SetActorRotation(SmoothRotation);
+}
+
+void AEnemy::FollowPlayer(float DeltaTime, FVector ToPlayer)
+{
+	if (bIsIlluminated) 
+	{ 
+		FVector Direction = ToPlayer.GetSafeNormal();
+		AddMovementInput(Direction, MoveSpeed * DeltaTime);
+	}
 }
 
 void AEnemy::SetIlluminated(bool bNewState)
@@ -61,24 +81,7 @@ void AEnemy::SetIlluminated(bool bNewState)
 	bIsIlluminated = bNewState;
 }
 
-void AEnemy::LookAtPlayer(float DeltaTime)
+void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	FVector ToPlayer = Player->GetActorLocation() - GetActorLocation(); 
-	FRotator LookAtRotation = ToPlayer.Rotation(); 
-	FRotator SmoothRotation = FMath::RInterpTo(GetActorRotation(), LookAtRotation, DeltaTime, RotationSpeed); 
-
-	SetActorRotation(SmoothRotation); 
-
-	FollowPlayer(DeltaTime, ToPlayer);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
-void AEnemy::FollowPlayer(float DeltaTime, FVector ToPlayer)
-{
-	if (bIsIlluminated) 
-	{ 
-		FVector Direction = ToPlayer.GetSafeNormal(); 
-		AddMovementInput(Direction, MoveSpeed * DeltaTime); 
-	}
-}
-
-

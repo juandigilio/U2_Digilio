@@ -134,6 +134,15 @@ void AU2_DigilioCharacter::ToggleFlashlight(const FInputActionValue& Value)
 
 	bool bIsOn = Flashlight->IsVisible();
 	Flashlight->SetVisibility(!bIsOn);
+
+	if (!Flashlight->IsVisible())
+	{
+		for (AEnemy* Enemy : EnemiesInLevel)
+		{
+			if (Enemy)
+				Enemy->SetIlluminated(false);
+		}
+	}
 }
 
 void AU2_DigilioCharacter::SetPlayerState()
@@ -184,7 +193,7 @@ void AU2_DigilioCharacter::DoJumpEnd()
 void AU2_DigilioCharacter::TakeDamage(float DamageAmount)
 {
 	CurrentHealth -= DamageAmount;
-	CachedPlayerState->Health = CurrentHealth;
+	CachedPlayerState->ApplyDamage(DamageAmount);
 
 	if (CurrentHealth <= 0)
 	{
