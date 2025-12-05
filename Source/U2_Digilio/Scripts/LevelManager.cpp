@@ -30,6 +30,8 @@ void ALevelManager::BeginPlay()
 			coin->OnCoinCollected.AddDynamic(this, &ALevelManager::OnCoinCollectedHandler);
 		}
 	}
+
+	CachedPlayerState->SetTotalCoins(totalCoins);
 }
 
 void ALevelManager::SetLights()

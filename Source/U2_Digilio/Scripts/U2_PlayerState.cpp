@@ -74,3 +74,8 @@ void AU2_PlayerState::OnCoinCollected()
 
 	UE_LOG(LogTemp, Warning, TEXT("PlayerState: Coin collected! Total: %d"), CollectedCoins);
 }
+
+void AU2_PlayerState::SetTotalCoins(int32 total)
+{
+	TotalCoins = total;
+}

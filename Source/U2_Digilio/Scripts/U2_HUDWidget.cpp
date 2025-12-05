@@ -21,21 +21,17 @@ void UU2_HUDWidget::NativeConstruct()
 void UU2_HUDWidget::UpdateStats()
 {
 	if (!PlayerStateRef) return;
+	
+	PB_Health->SetPercent(PlayerStateRef->Health / 100.f);
 
-	if (PB_Health)
+	PB_Energy->SetPercent(PlayerStateRef->GetEnergyPercent());
+
+	if (Coins)
 	{
-		float HealthPercent = PlayerStateRef->Health / 100.f;
-		PB_Health->SetPercent(HealthPercent);
+		FString Text = FString::Printf(TEXT("%d / %d"),
+			PlayerStateRef->CollectedCoins,
+			PlayerStateRef->TotalCoins);
+
+		Coins->SetText(FText::FromString(Text));
 	}
-
-	if (PB_Energy)
-	{
-		float EnergyPercent = PlayerStateRef->GetEnergyPercent();
-		PB_Energy->SetPercent(EnergyPercent);
-	}
-
-	/*if (RT_Coins)
-	{
-		RT_Coins->SetText(FText::AsNumber(PlayerStateRef->CollectedCoins));
-	}*/
 }

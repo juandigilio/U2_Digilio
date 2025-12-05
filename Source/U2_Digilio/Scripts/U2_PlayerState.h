@@ -23,6 +23,9 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Stats")
 	int32 CollectedCoins = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Stats")
+	int32 TotalCoins = 0;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Stats")
 	float Health = 100.f;
@@ -60,6 +63,8 @@ public:
 
 	UFUNCTION()
 	void OnCoinCollected();
+	UFUNCTION()
+	void SetTotalCoins(int32 total);
 
 	
 

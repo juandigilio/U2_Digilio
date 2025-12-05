@@ -36,6 +36,6 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* PB_Energy;
 
-	/*UPROPERTY(meta = (BindWidget))
-	UTextBlock* RT_Coins;*/
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* Coins;
 };
