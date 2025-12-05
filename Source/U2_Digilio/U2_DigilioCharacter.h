@@ -81,6 +81,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	virtual void DoJumpEnd();
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
+
+
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
@@ -102,9 +106,11 @@ private:
 	
 	float InitialFlashlightIntensity = 100000.f;
 	bool bIlluminatingEnemy;
+	bool bIsDead = false;
 	
 	bool CheckEnemyIllumination();
 	void HandleFlashlight(float DeltaTime);
 	void FindAllEnemies();
+	void HandleDeath();
 };
 

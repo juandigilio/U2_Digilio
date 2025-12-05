@@ -14,6 +14,7 @@
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "U2_Digilio.h"
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 AU2_DigilioCharacter::AU2_DigilioCharacter()
@@ -195,9 +196,10 @@ void AU2_DigilioCharacter::TakeDamage(float DamageAmount)
 	CurrentHealth -= DamageAmount;
 	CachedPlayerState->ApplyDamage(DamageAmount);
 
-	if (CurrentHealth <= 0)
+	if (CurrentHealth <= 0 && !bIsDead)
 	{
-		
+		bIsDead = true;
+		HandleDeath();
 	}
 }
 
@@ -324,4 +326,31 @@ void AU2_DigilioCharacter::FindAllEnemies()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Cargados %d enemigos."), EnemiesInLevel.Num());
+}
+
+void AU2_DigilioCharacter::HandleDeath()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+	}
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	if (GameOverWidgetClass)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			UUserWidget* GameOverWidget = CreateWidget<UUserWidget>(PC, GameOverWidgetClass);
+			if (GameOverWidget)
+			{
+				GameOverWidget->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameOverWidgetClass está vacío."));
+	}
 }
