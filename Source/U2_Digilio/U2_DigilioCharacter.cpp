@@ -181,6 +181,17 @@ void AU2_DigilioCharacter::DoJumpEnd()
 	StopJumping();
 }
 
+void AU2_DigilioCharacter::TakeDamage(float DamageAmount)
+{
+	CurrentHealth -= DamageAmount;
+	CachedPlayerState->Health = CurrentHealth;
+
+	if (CurrentHealth <= 0)
+	{
+		
+	}
+}
+
 bool AU2_DigilioCharacter::CheckEnemyIllumination()
 {
 	bool bIlluminating = false;

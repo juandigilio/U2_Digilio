@@ -2,12 +2,16 @@
 
 
 #include "Enemy.h"
-//#include <SideScrollingPlayerController.cpp>
+
+#include "U2_DigilioCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnEnemyOverlap);
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -17,6 +21,16 @@ void AEnemy::Tick(float DeltaTime)
 	if (!Player) return; 
 	
 	LookAtPlayer(DeltaTime);
+}
+
+void AEnemy::OnEnemyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AU2_DigilioCharacter* PlayerTemp = Cast<AU2_DigilioCharacter>(OtherActor))
+	{
+		PlayerTemp->TakeDamage(Damage);
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Player DAMAGED!"));
+	}
 }
 
 void AEnemy::BeginPlay()

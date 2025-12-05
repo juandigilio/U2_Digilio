@@ -84,6 +84,8 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	void TakeDamage(float DamageAmount);
+
 private:
 
 	UPROPERTY()
@@ -94,6 +96,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Flashlight", meta=(AllowPrivateAccess="true"))
 	float MinFlashlightIntensity = 5000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta=(AllowPrivateAccess="true"))
+	float CurrentHealth = 100.f;
 	
 	float InitialFlashlightIntensity = 100000.f;
 	bool bIlluminatingEnemy;
