@@ -103,6 +103,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta=(AllowPrivateAccess="true"))
 	float CurrentHealth = 100.f;
+
+	UFUNCTION()
+	void ReturnToMainMenu();
 	
 	float InitialFlashlightIntensity = 100000.f;
 	bool bIlluminatingEnemy;

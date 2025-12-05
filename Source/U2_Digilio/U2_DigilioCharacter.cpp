@@ -88,6 +88,8 @@ void AU2_DigilioCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	{
 		UE_LOG(LogU2_Digilio, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+
+	PlayerInputComponent->BindAction("QuitToMenu", IE_Pressed, this, &AU2_DigilioCharacter::ReturnToMainMenu);
 }
 
 void AU2_DigilioCharacter::Tick(float DeltaTime)
@@ -201,6 +203,17 @@ void AU2_DigilioCharacter::TakeDamage(float DamageAmount)
 		bIsDead = true;
 		HandleDeath();
 	}
+}
+
+void AU2_DigilioCharacter::ReturnToMainMenu()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetShowMouseCursor(true);
+		PC->SetInputMode(FInputModeUIOnly());
+	}
+
+	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenuLevel"));
 }
 
 bool AU2_DigilioCharacter::CheckEnemyIllumination()
