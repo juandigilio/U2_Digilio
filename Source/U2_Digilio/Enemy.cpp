@@ -15,7 +15,7 @@ void AEnemy::BeginPlay()
 
 	Player = Cast<AU2_DigilioCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
-	if (Player)
+	/*if (Player)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,
 			TEXT("Player ENCONTRADO"));
@@ -24,7 +24,7 @@ void AEnemy::BeginPlay()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
 			TEXT("Player ES NULL!"));
-	}
+	}*/
 }
 
 void AEnemy::Tick(float DeltaTime)

@@ -107,7 +107,7 @@ void AU2_DigilioCharacter::BeginPlay()
 
 	if (Flashlight)
 	{
-		InitialFlashlightIntensity = Flashlight->Intensity; // lee el valor que definiste en inspector (ej. 100000)
+		InitialFlashlightIntensity = Flashlight->Intensity;
 	}
 	else
 	{
@@ -337,8 +337,6 @@ void AU2_DigilioCharacter::FindAllEnemies()
 			EnemiesInLevel.Add(Enemy);
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Cargados %d enemigos."), EnemiesInLevel.Num());
 }
 
 void AU2_DigilioCharacter::HandleDeath()
